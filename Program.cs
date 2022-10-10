@@ -1,7 +1,10 @@
 ﻿using System;
 using System.IO;
 using iText.Kernel.Pdf;
-using iText.Kernel.Utils;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.IO.Image;
+using iText.Kernel.Geom;
 
 
 
@@ -44,11 +47,27 @@ namespace PDFConsolidate
                 return 0;
             }
 
+
+            Console.WriteLine("Write name of the output PDF: ");
+            var Filename = Console.ReadLine();
+
+
+            Image image = new Image(ImageDataFactory.Create(AllFoundImages[0].ToString()));
+            PdfWriter writer = new PdfWriter(@"./"+Filename+".pdf");
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf, new PageSize(image.GetImageHeight(),image.GetImageHeight()));
             
+
+            int pageNumber = 0;
             foreach(var Files in AllFoundImages)
             {
-                Console.WriteLine(Files.ToString());
+                image = new Image(ImageDataFactory.Create(Files.ToString()));
+                pdf.AddNewPage(new PageSize(image.GetImageWidth(), image.GetImageHeight()));
+                image.SetFixedPosition(++pageNumber, 0, 0);
+                document.Add(image);
             }
+            document.Close();
+            Console.WriteLine("PDF " + Filename + " is done");
             var key = Console.ReadKey();
             return 0;
             
